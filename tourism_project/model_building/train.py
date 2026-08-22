@@ -63,8 +63,7 @@ preprocessor = make_column_transformer(
 # Define base XGBoost model
 xgb_model = xgb.XGBClassifier(scale_pos_weight=class_weight, random_state=42)
 
-# Small grid so the pipeline runs fast on GitHub Actions.
-# Widen this if you want a more thorough hyperparameter search.
+# Small grid so the pipeline runs fast on GitHub Actions
 param_grid = {
     "xgbclassifier__n_estimators": [50, 100],
     "xgbclassifier__max_depth": [2, 3],
@@ -100,8 +99,10 @@ with mlflow.start_run():
     best_model = grid_search.best_estimator_
     print("Best params:", grid_search.best_params_)
 
+    # Set decision threshold to 0.45 to optimize for purchaser recall
     classification_threshold = 0.45
 
+    # Calculate raw probabilities for train/test and apply the classification threshold
     y_pred_train_proba = best_model.predict_proba(Xtrain)[:, 1]
     y_pred_train = (y_pred_train_proba >= classification_threshold).astype(int)
 
